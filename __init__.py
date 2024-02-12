@@ -4,6 +4,8 @@ from flask import json
 from datetime import datetime
 from urllib.request import urlopen
 import sqlite3
+import requests
+
                                                                                                                                        
 app = Flask(__name__)    
 
@@ -35,6 +37,30 @@ def mongraphique():
 @app.route("/histogramme/")
 def monhistogramme():
     return render_template("histogramme.html")
+
+
+@app.route('/commits/')
+def commits():
+    # Récupérer les données sur les commits depuis l'API GitHub
+    response = requests.get('https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits')
+    commits_data = response.json()
+
+    # Initialiser un dictionnaire pour stocker le nombre de commits par minute
+    commits_per_minute = {}
+
+    # Parcourir les données des commits et compter le nombre de commits par minute
+    for commit in commits_data:
+        commit_date_string = commit['commit']['author']['date']
+        commit_date_object = datetime.strptime(commit_date_string, '%Y-%m-%dT%H:%M:%SZ')
+        commit_minute = commit_date_object.strftime('%Y-%m-%d %H:%M:%S')[:-3]  # Ignorer les secondes
+        commits_per_minute[commit_minute] = commits_per_minute.get(commit_minute, 0) + 1
+
+    # Convertir le dictionnaire en listes séparées pour les labels et les valeurs
+    labels = list(commits_per_minute.keys())
+    values = list(commits_per_minute.values())
+
+    return render_template('commits.html', labels=labels, values=values)
+
                                                                                                                                        
 @app.route('/')
 def hello_world():
