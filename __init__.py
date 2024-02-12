@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 @app.route("/contact/")
 def MaPremiereAPI():
-    return send_file('contact.html')
+    return render_template("contact.html")
+
 
 @app.route('/paris/')
 def meteo():
