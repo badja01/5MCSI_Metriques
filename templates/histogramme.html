@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Métrique</title>
+  <title>Metrique</title>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
@@ -22,7 +22,7 @@
           dataTable.addRow([date.toLocaleDateString(), entry.temp]);
         });
 
-        // Configurer les options du graphique en histogramme (bar chart)
+        // Configurer les options du graphique en histogramme (colonne)
         var options = {
           title: 'Évolution des températures de Paris pour les 16 prochains jours',
           legend: { position: 'none' },
@@ -31,7 +31,7 @@
           hAxis: { title: 'Date' }
         };
 
-        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
         chart.draw(dataTable, options);
       }
 
