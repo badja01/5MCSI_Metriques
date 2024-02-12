@@ -1,78 +1,47 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart', 'bar']});
-      google.charts.setOnLoadCallback(drawStuff);
+<head>
+  <meta charset="UTF-8" />
+  <title>Métrique</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+  <div id="chart_div"></div>
+  <script>
+    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.setOnLoadCallback(drawBackgroundColor);
 
-      function drawStuff() {
+    function drawBackgroundColor() {
+      function drawChart(data) {
+        // Convertir les données récupérées en un tableau utilisable par Google Charts
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'Date');
+        dataTable.addColumn('number', 'Température');
+        data.results.forEach(entry => {
+          var date = new Date(entry.Jour * 1000);
+          dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+        });
 
-        var button = document.getElementById('change-chart');
-        var chartDiv = document.getElementById('chart_div');
-
-        var data = google.visualization.arrayToDataTable([
-          ['Galaxy', 'Distance', 'Brightness'],
-          ['Canis Major Dwarf', 8000, 23.3],
-          ['Sagittarius Dwarf', 24000, 4.5],
-          ['Ursa Major II Dwarf', 30000, 14.3],
-          ['Lg. Magellanic Cloud', 50000, 0.9],
-          ['Bootes I', 60000, 13.1]
-        ]);
-
-        var materialOptions = {
-          width: 900,
-          chart: {
-            title: 'Nearby galaxies',
-            subtitle: 'distance on the left, brightness on the right'
-          },
-          series: {
-            0: { axis: 'distance' }, // Bind series 0 to an axis named 'distance'.
-            1: { axis: 'brightness' } // Bind series 1 to an axis named 'brightness'.
-          },
-          axes: {
-            y: {
-              distance: {label: 'parsecs'}, // Left y-axis.
-              brightness: {side: 'right', label: 'apparent magnitude'} // Right y-axis.
-            }
-          }
+        // Configurer les options du graphique en histogramme (bar chart)
+        var options = {
+          title: 'Évolution des températures de Paris pour les 16 prochains jours',
+          legend: { position: 'none' },
+          bars: 'vertical', // Alignement vertical des barres
+          vAxis: { title: 'Température' },
+          hAxis: { title: 'Date' }
         };
 
-        var classicOptions = {
-          width: 900,
-          series: {
-            0: {targetAxisIndex: 0},
-            1: {targetAxisIndex: 1}
-          },
-          title: 'Nearby galaxies - distance on the left, brightness on the right',
-          vAxes: {
-            // Adds titles to each axis.
-            0: {title: 'parsecs'},
-            1: {title: 'apparent magnitude'}
-          }
-        };
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        chart.draw(dataTable, options);
+      }
 
-        function drawMaterialChart() {
-          var materialChart = new google.charts.Bar(chartDiv);
-          materialChart.draw(data, google.charts.Bar.convertOptions(materialOptions));
-          button.innerText = 'Change to Classic';
-          button.onclick = drawClassicChart;
-        }
-
-        function drawClassicChart() {
-          var classicChart = new google.visualization.ColumnChart(chartDiv);
-          classicChart.draw(data, classicOptions);
-          button.innerText = 'Change to Material';
-          button.onclick = drawMaterialChart;
-        }
-
-        drawMaterialChart();
-    };
-    </script>
-  </head>
-  <body>
-    <button id="change-chart">Change to Classic</button>
-    <br><br>
-    <div id="chart_div" style="width: 800px; height: 500px;"></div>
-  </body>
+      // Récupération de données depuis notre API /paris/
+      fetch('/paris/')
+        .then(response => response.json())
+        .then(data => {
+          drawChart(data);
+        });
+    }
+  </script>
+</body>
 </html>
-
