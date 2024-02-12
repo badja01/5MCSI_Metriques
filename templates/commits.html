@@ -3,32 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commits par minute</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>Commits</title>
+    <!-- Import de la librairie Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="chart_div"></div>
+    <canvas id="commitChart" width="800" height="400"></canvas>
     <script>
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-            var data = google.visualization.arrayToDataTable([
-                ['Minute', 'Commits'],
-                {% for i in range(labels|length) %}
-                ['{{ labels[i] }}', {{ values[i] }}],
-                {% endfor %}
-            ]);
-
-            var options = {
-                title: 'Nombre de commits par minute',
-                legend: { position: 'none' }
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
-            chart.draw(data, options);
+        // Fonction pour extraire les minutes d'une date donnée
+        function extractMinutes(dateString) {
+            var dateObject = new Date(dateString);
+            return dateObject.getMinutes();
         }
-    </script>
-</body>
-</html>
+
+        // Récupérer les données de l'API GitHub
+        fetch('http
